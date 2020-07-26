@@ -1,0 +1,107 @@
+DROP TABLE Conversation, Participants, Catalogs, Messages;
+
+SELECT count(role) as creator FROM "Users" WHERE role = 'creator';
+
+SELECT count(id), "Users".role FROM "Users" GROUP BY role;
+
+SELECT "Users".role, "Users".id, C.prize,  C."createdAt" >= '2019-12-25' AND C."createdAt" <= '2020-01-14' as hollidays FROM "Users"
+JOIN "Contests" C on "Users".id = C."userId"
+GROUP BY "Users".id, "Users".role = 'customer', C.prize, hollidays;
+
+
+UPDATE "Users"
+SET balance = balance + (SELECT sum(prize) FROM "Contests"
+                         where "Contests"."createdAt" >= '2019-12-25' AND "Contests"."createdAt" <= '2020-01-14'
+AND "Contests"."userId" = "Users".id)/10
+WHERE "Users".id IN
+    (SELECT "Contests"."userId" FROM  "Contests"
+    JOIN "Users" ON "Contests"."userId" = "Users".id
+    WHERE "Contests"."createdAt" >= '2019-12-25' AND "Contests"."createdAt" <= '2020-01-14'
+        AND role = 'customer')
+;
+
+
+UPDATE "Users"
+SET balance = balance + 20
+WHERE "Users".id  IN (select distinct rating FROM "Users"
+order by rating desc
+fetch first 3 rows only) AND "Users".role = 'creator';
+
+UPDATE "Users"
+    SET balance = balance + 20
+WHERE "Users".id IN (select "Users".id FROM "Users" WHERE "Users".role = 'creator'
+                      GROUP BY rating , "Users".role = 'creator', "Users".id
+                      ORDER by "Users".rating desc
+                          fetch first 3 rows only);
+
+
+INSERT INTO "Users" ("firstName", "lastName", "displayName", password, email, role, balance, rating)
+VALUES
+       ('Test', 'Testovich', 'Testenko', 'test1234', 'test11232@gmail.com', 'creator','300', '8'),
+       ('Test', 'Testovich', 'Testenko', 'Marat', 'Mar4at2@gmail.com', 'creator', '500', '20'),
+       ('Test', 'Testovich', 'Testenko', 'Rapunsel', 'Rapu5nsel123@gmail.com', 'creator','800', '2'),
+       ('Test', 'Testovich', 'Testenko', 'Digital', 'Digi4tal123@gmail.com', 'creator', '900', '10'),
+       ('Test', 'Testovich', 'Testenko', 'FiftyCent', 'Fif4tyCent123@gmail.com', 'creator', '1000', '15'),
+       ('Test', 'Testovich', 'Testenko', 'SnopDog', 'Sno4pDog123@gmail.com', 'creator', '1200', '7'),
+       ('Test', 'Testovich', 'Testenko', 'Mumiya', 'Mumiy4a123@gmail.com', 'creator', '90000', '18')
+       ;
+
+INSERT INTO "Contests" ("contestType", "fileName", "originalFileName", title, "typeOfName", industry, "focusOfWork", "targetCustomer", "styleName", "nameVenture", "typeOfTagline", status, "brandStyle", prize, "createdAt", priority, "orderId", "userId")
+VALUES
+('logo', 'lalala', 'testtest', 'testevfnrgufd', 'asdfmiretnvdf', 'asdmfisdagnirv', 'asdnuvrtiwdsmnvir', 'madmasidf', 'fsdmisa', 'masdifrbvua,sod', 'asfmirvnuasd', 'asnurvrnue', 'fnsudvrvnutr', ' 100' , '2019-12-20', '1', '9', '16'),
+('logo', 'lalala', 'testtest', 'testevfnrgufd', 'asdfmiretnvdf', 'asdmfisdagnirv', 'asdnuvrtiwdsmnvir', 'madmasidf', 'fsdmisa', 'masdifrbvua,sod', 'asfmirvnuasd', 'asnurvrnue', 'fnsudvrvnutr', ' 100' , '2019-12-30', '2', '10', '17'),
+('logo', 'lalala', 'testtest', 'testevfnrgufd', 'asdfmiretnvdf', 'asdmfisdagnirv', 'asdnuvrtiwdsmnvir', 'madmasidf', 'fsdmisa', 'masdifrbvua,sod', 'asfmirvnuasd', 'asnurvrnue', 'fnsudvrvnutr', ' 100' , '2019-12-31', '1', '11', '18'),
+('logo', 'lalala', 'testtest', 'testevfnrgufd', 'asdfmiretnvdf', 'asdmfisdagnirv', 'asdnuvrtiwdsmnvir', 'madmasidf', 'fsdmisa', 'masdifrbvua,sod', 'asfmirvnuasd', 'asnurvrnue', 'fnsudvrvnutr', ' 100' , '2020-01-05', '4', '12', '19'),
+('logo', 'lalala', 'testtest', 'testevfnrgufd', 'asdfmiretnvdf', 'asdmfisdagnirv', 'asdnuvrtiwdsmnvir', 'madmasidf', 'fsdmisa', 'masdifrbvua,sod', 'asfmirvnuasd', 'asnurvrnue', 'fnsudvrvnutr', ' 100' , '2020-02-20', '1', '13', '20'),
+('logo', 'lalala', 'testtest', 'testevfnrgufd', 'asdfmiretnvdf', 'asdmfisdagnirv', 'asdnuvrtiwdsmnvir', 'madmasidf', 'fsdmisa', 'masdifrbvua,sod', 'asfmirvnuasd', 'asnurvrnue', 'fnsudvrvnutr', ' 100' , '2020-01-01', '2', '15', '21'),
+('logo', 'lalala', 'testtest', 'testevfnrgufd', 'asdfmiretnvdf', 'asdmfisdagnirv', 'asdnuvrtiwdsmnvir', 'madmasidf', 'fsdmisa', 'masdifrbvua,sod', 'asfmirvnuasd', 'asnurvrnue', 'fnsudvrvnutr', ' 100' , '2020-10-15', '3', '345', '22'),
+('logo', 'lalala', 'testtest', 'testevfnrgufd', 'asdfmiretnvdf', 'asdmfisdagnirv', 'asdnuvrtiwdsmnvir', 'madmasidf', 'fsdmisa', 'masdifrbvua,sod', 'asfmirvnuasd', 'asnurvrnue', 'fnsudvrvnutr', ' 100' , '2019-12-28', '5', '45', '22')
+;
+
+
+
+CREATE TABLE Conversation
+(
+    id serial PRIMARY KEY ,
+    createdAt timestamp DEFAULT now() NOT NULL ,
+    updatedAt timestamp NOT NULL
+);
+
+
+
+
+CREATE TABLE Participants (
+    usersId integer REFERENCES "Users"(id),
+    conversationId integer REFERENCES Conversation(id),
+    blackList boolean DEFAULT false NOT NULL ,
+    favoriteList boolean DEFAULT false NOT NULL ,
+    PRIMARY KEY (usersId, conversationId)
+);
+
+CREATE TABLE Catalogs (
+    id serial PRIMARY KEY ,
+  userId integer REFERENCES "Users"(id),
+  catalogName varchar (32) NOT NULL
+);
+
+CREATE TABLE CatalogsToConversation(
+  catalogsId integer REFERENCES Catalogs(id),
+  conversationId integer REFERENCES Conversation(id),
+  PRIMARY KEY (catalogsId, conversationId)
+);
+
+CREATE TABLE Messages (
+    id serial PRIMARY KEY,
+    sender integer REFERENCES "Users"(id),
+    body text NOT NULL ,
+    conversationId integer REFERENCES Conversation(id),
+    createdAt timestamp DEFAULT now() NOT NULL ,
+    updatedAt timestamp NOT NULL
+
+
+);
+
+ALTER TYPE "enum_Users_role" ADD VALUE 'moderator';
+
+INSERT INTO "Users" ("firstName", "lastName", "displayName", password, email, role)
+VALUES ('Moderator', 'Moder', 'Moderator' , 'test1234', 'bondarenko.alex.sergeevich@gmail.ru','moderator')

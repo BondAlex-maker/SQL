@@ -73,8 +73,6 @@ CREATE TABLE Conversation
 CREATE TABLE Participants (
     usersId integer REFERENCES "Users"(id),
     conversationId integer REFERENCES Conversation(id),
-    blackList boolean DEFAULT false NOT NULL ,
-    favoriteList boolean DEFAULT false NOT NULL ,
     PRIMARY KEY (usersId, conversationId)
 );
 
